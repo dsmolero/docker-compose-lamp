@@ -40,11 +40,48 @@ Wait a few moments for the mysql database server to stabilize.
 Your LAMP stack is now ready!! You can access it via `http://dockerhost`.
 
 
+## Integrate your Laravel Application
+
+Shut down the docker containers:
+
+    $ docker-compose down
+
+Cleanup the volume leftovers manually (Careful with docker-compose down -v).
+
+Place your laravel app inside the current directory. ex:
+
+    $ cp -R ~/public_html/myapp myapp
+
+NO need to set group ownership of:
+
+    ./myapp/storage and ./myapp/bootstrap/cache to _www or www-data
+
+
 ## Configuration
 
 This package comes with default configuration options. You can modify them by creating `.env` file in your root directory.
 
 To make it easy, just copy the content from `sample.env` file and update the environment variable values as per your need.
+
+    $ cp sample.env .env
+    $ nano .env
+
+Put the following entries:
+
+    PROJECT_ROOT = ./myapp
+
+Edit your Laravel app configuration:
+
+    $ nano myapp/.env
+
+Put the following entries:
+
+    DB_CONNECTION=mysql
+    DB_HOST=mysql
+    DB_PORT=3306
+    DB_DATABASE=myapp
+    DB_USERNAME=root
+    DB_PASSWORD=tiger
 
 
 ### Configuration Variables
@@ -55,10 +92,6 @@ _**PROJECT_ROOT**_
 
 The project directory. The document root for Apache server will be ${PROJECT_ROOT}/public. The default value for 
 this is `./www`.
-
-_**MYSQL_DATA_DIR**_
-
-This is MySQL data directory. The default value for this is `./data/mysql`. All your MySQL data files will be stored here.
 
 _**VHOSTS_DIR**_
 
@@ -83,8 +116,41 @@ _**MYSQL_ROOT_PASSWORD**_
 This will be the password for user root of the MySQL database server. The default value is 'tiger'.
 
 
-## Web Server
+## Create the Application Database
+    
+Launch
+    $ docker-compose up -d
 
+Wait a few moments for the mysql database server to stabilize.
+
+Create the database
+
+Open phpmyadmin in your browser
+  
+    http://dockerhost:8080
+
+Create the database for your app
+  
+    myapp
+
+Do the database migrations. In the terminal:
+
+    $ docker-compose exec webserver php artisan migrate
+
+
+## Create the storage symbolic link:
+
+    $ docker-compose exec webserver php artisan storage:link
+
+
+## Launching the Web Server
+
+Run the docker containers.
+
+    $ docker-compose up -d
+
+Wait for a few moments for mysql to stabilize.
+    
 Apache is configured to run on port 80. So, you can access it via `http://dockerhost`.
 
 
