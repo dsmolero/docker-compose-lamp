@@ -1,10 +1,6 @@
 LAMP stack built with Docker Compose
 ====================================
 
-* Updated by Darwin Molero <darwinm@coderax.com>
-* on October 31, 2019
-
-
 This is a basic LAMP stack environment built using Docker Compose. It consists following:
 
 * PHP 7.1
@@ -27,7 +23,7 @@ Clone this repository on your local computer and switch to branch `7.1.x`.
 Run the `docker-compose up -d`.
 
 ```shell
-git clone https://github.com/sprintcube/docker-compose-lamp.git
+git clone https://github.com/dsmolero/docker-compose-lamp.git
 cd docker-compose-lamp/
 git fetch --all
 git checkout 7.1.x
@@ -46,15 +42,14 @@ Shut down the docker containers:
 
     $ docker-compose down
 
-Cleanup the volume leftovers manually (Careful with docker-compose down -v).
+Cleanup the volume leftovers manually (Careful with `docker-compose down -v`).
 
 Place your laravel app inside the current directory. ex:
 
     $ cp -R ~/public_html/myapp myapp
 
-NO need to set group ownership of:
-
-    ./myapp/storage and ./myapp/bootstrap/cache to _www or www-data
+> NO need to set group ownership of 
+> `./myapp/storage` and `./myapp/bootstrap/cache` to `_www` or `www-data`
 
 
 ## Configuration
@@ -90,7 +85,7 @@ There are following configuration variables available and you can customize them
 
 _**PROJECT_ROOT**_
 
-The project directory. The document root for Apache server will be ${PROJECT_ROOT}/public. The default value for 
+The project directory. The document root for Apache server will be `${PROJECT_ROOT}/public`. The default value for 
 this is `./www`.
 
 _**VHOSTS_DIR**_
@@ -101,7 +96,7 @@ This is for virtual hosts. The default value for this is `./config/vhosts`. You 
 
 _**PHP_INI**_
 
-Path to php.ini file. The default is at ./config/php/php.ini
+Path to `php.ini` file. The default is at `./config/php/php.ini`.
 
 _**APACHE_LOG_DIR**_
 
@@ -113,23 +108,22 @@ This will be used to store Apache logs. The default value for this is `./logs/my
 
 _**MYSQL_ROOT_PASSWORD**_
 
-This will be the password for user root of the MySQL database server. The default value is 'tiger'.
+This will be the password for user root of the MySQL database server. The default value is `'tiger'`.
 
 
 ## Create the Application Database
     
-Launch
+Launch the docker containers:
+    
     $ docker-compose up -d
 
 Wait a few moments for the mysql database server to stabilize.
 
-Create the database
-
-Open phpmyadmin in your browser
+Open phpmyadmin in your browser:
   
     http://dockerhost:8080
 
-Create the database for your app
+Create the database for your app:
   
     myapp
 
@@ -138,7 +132,7 @@ Do the database migrations. In the terminal:
     $ docker-compose exec webserver php artisan migrate
 
 
-## Create the storage symbolic link:
+## Create the storage symbolic link
 
     $ docker-compose exec webserver php artisan storage:link
 
@@ -151,7 +145,7 @@ Run the docker containers.
 
 Wait for a few moments for mysql to stabilize.
     
-Apache is configured to run on port 80. So, you can access it via `http://dockerhost`.
+Apache is configured to run on port 80. So, you can access it via `http://dockerhost`
 
 
 #### Apache Modules
@@ -205,7 +199,7 @@ By default following extensions are installed.
 
 ## phpMyAdmin
 
-phpMyAdmin is configured to run on port 8080. Use following default credentials.
+phpMyAdmin is configured to run on port `8080`. Use following default credentials.
 
 http://dockerhost:8080/  
 username: root  
