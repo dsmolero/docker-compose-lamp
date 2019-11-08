@@ -4,8 +4,7 @@ services:
 
   webserver:
     build: 
-      context: ../
-      dockerfile: ./deploy/bin/webserver/Dockerfile
+      context: ./bin/webserver
     container_name: '7.1.x-webserver'
     restart: unless-stopped
     ports:
@@ -14,10 +13,10 @@ services:
     depends_on: 
       - mysql
     volumes: 
-      - ../${PROJECT_NAME-deploy/www}:/var/www/html
-      - ../${PHP_INI-deploy/config/php/php.ini}:/usr/local/etc/php/php.ini
-      - ../${VHOSTS_DIR-deploy/config/vhosts}:/etc/apache2/sites-enabled
-      - ../${APACHE_LOG_DIR-deploy/logs/apache2}:/var/log/apache2
+      - ${PROJECT_ROOT-./www}:/var/www/html
+      - ${PHP_INI-./config/php/php.ini}:/usr/local/etc/php/php.ini
+      - ${VHOSTS_DIR-./config/vhosts}:/etc/apache2/sites-enabled
+      - ${APACHE_LOG_DIR-./logs/apache2}:/var/log/apache2
 
   mysql:
     image: mysql:5.7.22
@@ -27,7 +26,7 @@ services:
       - "3306"
     volumes: 
       - mysql_data:/var/lib/mysql
-      - ../${MYSQL_LOG_DIR-deploy/logs/mysql}:/var/log/mysql
+      - ${MYSQL_LOG_DIR-./logs/mysql}:/var/log/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD-tiger}
 
