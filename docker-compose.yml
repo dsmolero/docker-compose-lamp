@@ -13,10 +13,10 @@ services:
     depends_on: 
       - mysql
     volumes: 
-      - ${PROJECT_ROOT-./www}:/var/www/html
-      - ${PHP_INI-./config/php/php.ini}:/usr/local/etc/php/php.ini
-      - ${VHOSTS_DIR-./config/vhosts}:/etc/apache2/sites-enabled
-      - ${APACHE_LOG_DIR-./logs/apache2}:/var/log/apache2
+      - ${DCL_PROJECT_ROOT-./www}:/var/www/html
+      - ${DCL_PHP_INI-./config/php/php.ini}:/usr/local/etc/php/php.ini
+      - ${DCL_VHOSTS_DIR-./config/vhosts}:/etc/apache2/sites-enabled
+      - ${DCL_APACHE_LOG_DIR-./logs/apache2}:/var/log/apache2
 
   mysql:
     image: mysql:5.7.22
@@ -26,9 +26,9 @@ services:
       - "3306"
     volumes: 
       - mysql_data:/var/lib/mysql
-      - ${MYSQL_LOG_DIR-./logs/mysql}:/var/log/mysql
+      - ${DCL_MYSQL_LOG_DIR-./logs/mysql}:/var/log/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD-tiger}
+      - MYSQL_ROOT_PASSWORD=${DCL_MYSQL_ROOT_PASSWORD-tiger}
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin

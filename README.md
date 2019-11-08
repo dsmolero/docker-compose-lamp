@@ -18,59 +18,65 @@ Edit /etc/hosts file and add the following
 
 ## Installation
 
-Clone this repository on your local computer and switch to branch `7.1.x`. 
+cd into the directory of a Laravel project:
 
-Run the `docker-compose up -d`.
+    $ cd /var/www/mylaravelproject/
 
-```shell
-git clone https://github.com/dsmolero/docker-compose-lamp.git
-cd docker-compose-lamp/
-git fetch --all
-git checkout 7.1.x
-cp sample.env .env
-docker-compose up -d
-```
+Clone this repository and switch to branch `7.1.x`. 
+
+    $ git clone https://github.com/dsmolero/docker-compose-lamp.git
+
+Now your Laravel project directory should resemble this:
+
+    ex:
+        /var/www/mylaravelproject/
+            app/
+            public/
+            component.json
+            ...
+            docker-compose-lamp/
+            ...
+
+> Note: There is NO need to set permissions for `./storage` and `./bootstrap/cache` to `_www` or `www-data`
+
+Checkout the PHP version that you need:
+
+    ```shell
+    $ cd docker-compose-lamp/
+    $ git fetch --all
+    $ git checkout 7.1.x
+    $ cp sample.env docker.env
+    ```
+
+Launch the container:
+
+    $ docker-compose -f docker-compose-lamp/docker-compose.yml up -d
 
 Wait a few moments for the mysql database server to stabilize.
 
-Your LAMP stack is now ready!! You can access it via `http://dockerhost`.
+Your LAMP stack is now ready!! You can access it at `http://dockerhost`.
 
 
-## Integrate your Laravel Application
+## Configure to Integrate your Laravel Application
+
+This package comes with default configuration options. To customize:
 
 Shut down the docker containers:
 
-    $ docker-compose down
+    $ docker-compose -f docker-compose-lamp/docker-compose.yml down
 
-Cleanup the volume leftovers manually (Careful with `docker-compose down -v`).
+Append the contents of `sample.env` into your project's `.env` file:
 
-Place your laravel app inside the current directory. ex:
+    $ cat docker-compose-lamp/sample.env >> .env
 
-    $ cp -R ~/public_html/myapp myapp
+Edit your `.env` file (the new settings are at the bottom):
 
-> NO need to set group ownership of 
-> `./myapp/storage` and `./myapp/bootstrap/cache` to `_www` or `www-data`
-
-
-## Configuration
-
-This package comes with default configuration options. You can modify them by creating `.env` file in your root directory.
-
-To make it easy, just copy the content from `sample.env` file and update the environment variable values as per your need.
-
-    $ cp sample.env .env
     $ nano .env
 
-Put the following entries:
+Modify the following entries:
 
-    PROJECT_ROOT = ./myapp
-
-Edit your Laravel app configuration:
-
-    $ nano myapp/.env
-
-Put the following entries:
-
+    PROJECT_ROOT=..
+    # You can leave the following to their defaults
     DB_CONNECTION=mysql
     DB_HOST=mysql
     DB_PORT=3306
@@ -83,58 +89,31 @@ Put the following entries:
 
 There are following configuration variables available and you can customize them by overwritting in your own `.env` file.
 
-_**PROJECT_ROOT**_
+_**DCL_PROJECT_ROOT**_
 
-The project directory. The document root for Apache server will be `${PROJECT_ROOT}/public`. The default value for 
-this is `./www`.
+The project directory. The document root for Apache server will be ${PROJECT_ROOT}/public. Set this to `..`. The default value for this is `./www`.
 
-_**VHOSTS_DIR**_
+_**DCL_VHOSTS_DIR**_
 
 This is for virtual hosts. The default value for this is `./config/vhosts`. You can place your virtual hosts conf files here.
 
 > Make sure you add an entry to your system's `hosts` file for each virtual host.
 
-_**PHP_INI**_
+_**DCL_PHP_INI**_
 
-Path to `php.ini` file. The default is at `./config/php/php.ini`.
+Path to php.ini file. The default is at ./config/php/php.ini
 
-_**APACHE_LOG_DIR**_
+_**DCL_APACHE_LOG_DIR**_
 
 This will be used to store Apache logs. The default value for this is `./logs/apache2`.
 
-_**MYSQL_LOG_DIR**_
+_**DCL_MYSQL_LOG_DIR**_
 
 This will be used to store Apache logs. The default value for this is `./logs/mysql`.
 
-_**MYSQL_ROOT_PASSWORD**_
+_**DCL_MYSQL_ROOT_PASSWORD**_
 
-This will be the password for user root of the MySQL database server. The default value is `'tiger'`.
-
-
-## Create the Application Database
-    
-Launch the docker containers:
-    
-    $ docker-compose up -d
-
-Wait a few moments for the mysql database server to stabilize.
-
-Open phpmyadmin in your browser:
-  
-    http://dockerhost:8080
-
-Create the database for your app:
-  
-    myapp
-
-Do the database migrations. In the terminal:
-
-    $ docker-compose exec webserver php artisan migrate
-
-
-## Create the storage symbolic link
-
-    $ docker-compose exec webserver php artisan storage:link
+This will be the password for user root of the MySQL database server. The default value is 'tiger'.
 
 
 ## Launching the Web Server
@@ -143,9 +122,34 @@ Run the docker containers.
 
     $ docker-compose up -d
 
+> We are not ready to visit the website yet. We still have to prepare the database.
+
 Wait for a few moments for mysql to stabilize.
     
-Apache is configured to run on port 80. So, you can access it via `http://dockerhost`
+
+## Create the Application Database
+    
+Open phpmyadmin in your browser
+  
+    http://dockerhost:8080
+
+Create the database for your app
+  
+    myapp
+
+Do the database migrations. In the terminal:
+
+    $ docker-compose -f docker-compose-lamp/docker-compose.yml exec webserver php artisan migrate
+
+
+## Create the storage symbolic link:
+
+    $ docker-compose -f docker-compose-lamp/docker-compose.yml exec webserver php artisan storage:link
+
+
+## Ready!
+
+Apache is configured to run on port 80. So, you can access it via `http://dockerhost`.
 
 
 #### Apache Modules
@@ -156,16 +160,14 @@ By default following modules are enabled.
 * headers
 
 > If you want to enable more modules, just update `./bin/webserver/Dockerfile`. You can also generate a PR and we will merge if seems good for general purpose.
-> You have to rebuild the docker image by running `docker-compose build` and restart the docker containers.
+> You have to rebuild the docker image by running `docker-compose build` (from within this project's directory) and restart the docker containers.
 
 
 #### Connect via SSH
 
-You can connect to web server using `docker-compose exec` command to perform various operation on it. Use below command to login to container via ssh.
+You can connect to web server to perform various operations on it. Use below command to login to container via ssh.
 
-```shell
-docker-compose exec webserver bash
-```
+    $ docker-compose -f docker-compose-lamp/docker-compose.yml exec webserver bash
 
 
 ## PHP
@@ -174,7 +176,7 @@ The installed version of PHP is 7.1.
 
 You can run php commands like this:
 
-    $ docker-compose exec webserver php artisan migrate
+    $ docker-compose -f docker-compose-lamp/docker-compose.yml exec webserver php artisan route:list
 
 
 #### Extensions
@@ -194,12 +196,12 @@ By default following extensions are installed.
 * gd
 
 > If you want to install more extension, just update `./bin/webserver/Dockerfile`. You can also generate a PR and we will merge if seems good for general purpose.
-> You have to rebuild the docker image by running `docker-compose build` and restart the docker containers.
+> You have to rebuild the docker image by running `docker-compose build` (from within this project's directory) and restart the docker containers.
 
 
 ## phpMyAdmin
 
-phpMyAdmin is configured to run on port `8080`. Use following default credentials.
+phpMyAdmin is configured to run on port 8080. Use following default credentials.
 
 http://dockerhost:8080/  
 username: root  
